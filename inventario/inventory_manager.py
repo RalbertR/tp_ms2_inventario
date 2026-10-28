@@ -44,7 +44,7 @@ class InventoryManager:
             try:
                 observer.on_low_stock(product_id, quantity)
             except Exception as error:
-                logger.error(
+                logger.exception(
                     "%s falló al avisar stock bajo de %s: %s",
                     type(observer).__name__,
                     product_id,

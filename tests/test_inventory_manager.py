@@ -114,3 +114,42 @@ def test_vender_un_producto_inexistente_da_un_error_claro():
     # Assert
     assert str(error.value) == "No existe el producto PROD-999 en el inventario"
     assert manager.stock == {}
+
+
+class ObservadorRoto(StockObserver):
+    def on_low_stock(self, product_id: str, quantity: int) -> None:
+        raise ConnectionError("error de red simulado")
+
+
+def test_un_observador_que_falla_no_corta_el_aviso_a_los_demas(caplog):
+    # Arrange
+    manager = InventoryManager()
+    manager.update_stock("PROD-001", 50)
+    antes, despues = ObservadorEspia(), ObservadorEspia()
+    manager.subscribe(antes)
+    manager.subscribe(ObservadorRoto())
+    manager.subscribe(despues)
+
+    # Act
+    manager.sell_product("PROD-001", 45)
+
+    # Assert
+    assert antes.avisos == [("PROD-001", 5)]
+    assert despues.avisos == [("PROD-001", 5)]
+    assert "ObservadorRoto falló al avisar stock bajo de PROD-001" in caplog.text
+    assert caplog.records[0].exc_info is not None
+
+
+def test_un_observador_desuscripto_deja_de_recibir_avisos():
+    # Arrange
+    manager = InventoryManager()
+    manager.update_stock("PROD-001", 50)
+    espia = ObservadorEspia()
+    manager.subscribe(espia)
+    manager.unsubscribe(espia)
+
+    # Act
+    manager.sell_product("PROD-001", 45)
+
+    # Assert
+    assert espia.avisos == []

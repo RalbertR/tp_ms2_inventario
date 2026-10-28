@@ -15,3 +15,18 @@ python3.13 -m venv .venv
 
 - Antes de abrir un PR, leer la [Definition of Done](DEFINITION_OF_DONE.md).
 - Los issues se cargan con las plantillas de `.github/ISSUE_TEMPLATE`.
+
+## Pre-commit hook
+
+`hooks/pre-commit` corre en orden black, ruff y pytest con el umbral de cobertura de la
+DoD. Si un paso falla, el commit se aborta. Se activa una vez por clon:
+
+```
+git config core.hooksPath hooks
+```
+
+## Análisis estático
+
+- SonarQube local en Docker, con la configuración de `sonar-project.properties` y el
+  `coverage.xml` que genera `pytest --cov --cov-report=xml`.
+- Dependencias: `pip-audit -r requirements.txt`.

@@ -17,6 +17,7 @@ filterwarnings = ["error"]
 [tool.coverage.run]
 source = ["inventario"]
 branch = true
+relative_files = true
 
 [tool.coverage.report]
 show_missing = true

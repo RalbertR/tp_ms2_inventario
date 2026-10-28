@@ -11,3 +11,9 @@ class StockInsuficienteError(Exception):
 
 class PagoRechazadoError(Exception):
     pass
+
+
+class ProductoInexistenteError(Exception):
+    def __init__(self, producto_id: str) -> None:
+        super().__init__(f"No existe el producto {producto_id} en el inventario")
+        self.producto_id = producto_id

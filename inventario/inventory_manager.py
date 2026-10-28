@@ -1,5 +1,6 @@
 import logging
 
+from inventario.errores import ProductoInexistenteError, StockInsuficienteError
 from inventario.stock_observer import StockObserver
 
 LOW_STOCK_THRESHOLD = 10
@@ -23,7 +24,14 @@ class InventoryManager:
         self._check_low_stock(product_id)
 
     def sell_product(self, product_id: str, sold: int) -> None:
-        self.stock[product_id] -= sold
+        if sold <= 0:
+            raise ValueError(f"La cantidad vendida tiene que ser positiva: {sold}")
+        if product_id not in self.stock:
+            raise ProductoInexistenteError(product_id)
+        available = self.stock[product_id]
+        if sold > available:
+            raise StockInsuficienteError(product_id, sold, available)
+        self.stock[product_id] = available - sold
         self._check_low_stock(product_id)
 
     def _check_low_stock(self, product_id: str) -> None:

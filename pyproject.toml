@@ -8,3 +8,15 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["inventario"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
